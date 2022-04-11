@@ -1,10 +1,10 @@
-import csv
 import logging
 from logging import getLogger
 
 import click
 
 from cli_validator import validate_positive_int, validate_url
+from report_writer import save_report
 from web_page import Page
 
 log = getLogger(__name__)
@@ -26,7 +26,6 @@ def run_crawler(root: str, depth: int, mode: str, output: str):
         for link in current_links_queue:
             links_in_page = process_page(current_depth(depth, start_depth), link, visited_pages)
             enqueue_links(links_in_page, further_links_queue)
-            log.info(f"current in further queue: {len(further_links_queue)}, queued links: {len(links_in_page)}")
 
         log.info(f"current count of visited pages {len(visited_pages)}")
 
@@ -34,21 +33,16 @@ def run_crawler(root: str, depth: int, mode: str, output: str):
         further_links_queue = set()
         depth -= 1
 
-    with open(output, 'wt') as out_file:
-        tsv_writer = csv.writer(out_file, delimiter='\t')
-        tsv_writer.writerow(['url', 'depth', 'ratio'])  # header
-        for url, (depth, rank) in visited_pages.items():
-            tsv_writer.writerow([url, depth, rank])
-
-    log.info(f"finished crawling, result saved to {output}")
+    save_report(output, visited_pages)
 
 
 def current_depth(depth, start_depth):
     return start_depth - depth
 
 
-def enqueue_links(links_in_page, tmp_links_queue):
-    tmp_links_queue.update(links_in_page)
+def enqueue_links(links_in_page, further_links_queue):
+    log.info(f"current in further queue: {len(further_links_queue)}, queued links: {len(links_in_page)}")
+    further_links_queue.update(links_in_page)
 
 
 def process_page(depth, link, visited_pages):

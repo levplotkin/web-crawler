@@ -1,5 +1,19 @@
 # web-crawler
 
+crawler keeps visited pages data in memory, in future it can be switched to database
+
+crawler keeps queue of links in memory, in future it can be switched to queue management system
+
+report saved to local file (tsv) at the end of crawler process in future it can be replaced by streaming to show the results during the process
+
+
+#### components: 
+- user parameters validator (cli_validator.py)
+- crawler (web_crawler.py)
+- page parser (web_page.py)
+- report writer (report_writer.py)
+
+
 ### command example
 
 ```
